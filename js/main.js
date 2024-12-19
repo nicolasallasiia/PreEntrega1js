@@ -2,151 +2,166 @@
 const IVA = 0.21; // Constante para cálculo del IVA
 const operacionesRealizadas = []; // Array para guardar el historial de operaciones
 
-// Función para pedir un número al usuario
-function pedirNumero(mensaje) {
-    let numero = parseFloat(prompt(mensaje));
-    while (isNaN(numero)) {
-        alert("Por favor, ingrese un número válido");
-        numero = parseFloat(prompt(mensaje));
-    }
-    return numero;
-}
+// Referencias al DOM
+const output = document.getElementById("output");
+const menu = document.getElementById("menu");
+const inputSection = document.getElementById("input-section");
+const input1 = document.getElementById("input1");
+const input2 = document.getElementById("input2");
+const result = document.getElementById("result");
+const executeButton = document.getElementById("execute");
+const dataSection = document.getElementById("data-section");
+const fetchButton = document.getElementById("fetch-data");
 
-// Función para agregar una operación al historial
-function agregarOperacion(operacion, resultado) {
-    operacionesRealizadas.push({ operacion, resultado });
-}
-
-// Función para buscar una operación en el historial
-function buscarOperacion(busqueda) {
-    return operacionesRealizadas.filter(op =>
-        op.operacion.toLowerCase().includes(busqueda.toLowerCase())
-    );
-}
-
-// Inicio del programa
-function iniciarPrograma() {
-    const nombre = prompt("Ingrese su nombre");
-    let edad = parseInt(prompt("Ingrese su edad"));
-
-    while (isNaN(edad) || edad < 18) {
-        if (isNaN(edad)) {
-            alert("Por favor, ingrese una edad válida.");
-        } else if (edad < 18) {
-            alert("Debe ser mayor de 18 años para continuar.");
-        }
-        edad = parseInt(prompt("Ingrese su edad"));
-    }
-
-    alert("Bienvenido " + nombre);
-
-    // Menú principal
-    const menu = `
-    1- Multiplicar
-    2- Dividir
-    3- Sumar
-    4- Restar
-    5- Calcular IVA
-    6- Mostrar Historial de Operaciones
-    7- Buscar Operaciones
-    8- Salir
-    `;
-
-    let opcion;
-
-    while (true) {
-        opcion = parseInt(prompt("Ingrese la opción: " + menu));
-
-        while (isNaN(opcion)) {
-            alert("Ingrese un número válido");
-            opcion = parseInt(prompt("Ingrese la opción: " + menu));
-        }
-
-        switch (opcion) {
-            case 1: // Multiplicar
-                let numero1 = pedirNumero("Ingrese el número que desea multiplicar:");
-                let multiplicador = pedirNumero("Ingrese el número por el cual desea multiplicar:");
-                let resultadoMultiplicacion = numero1 * multiplicador;
-                alert("El resultado es: " + resultadoMultiplicacion);
-                agregarOperacion("Multiplicar", resultadoMultiplicacion);
-                break;
-
-            case 2: // Dividir
-                let dividendo = pedirNumero("Ingrese el número que desea dividir:");
-                let divisor = pedirNumero("Ingrese el número por el cual desea dividir:");
-                if (divisor !== 0) {
-                    let resultadoDivision = dividendo / divisor;
-                    alert("El resultado es: " + resultadoDivision);
-                    agregarOperacion("Dividir", resultadoDivision);
-                } else {
-                    alert("No se puede dividir por cero");
-                }
-                break;
-
-            case 3: // Sumar
-                let sumando1 = pedirNumero("Ingrese el primer número que desea sumar:");
-                let sumando2 = pedirNumero("Ingrese el segundo número que desea sumar al anterior:");
-                let resultadoSuma = sumando1 + sumando2;
-                alert("El resultado es: " + resultadoSuma);
-                agregarOperacion("Sumar", resultadoSuma);
-                break;
-
-            case 4: // Restar
-                let minuendo = pedirNumero("Ingrese el primer número que desea restar:");
-                let sustraendo = pedirNumero("Ingrese el número que desea restar al anterior:");
-                let resultadoResta = minuendo - sustraendo;
-                alert("El resultado es: " + resultadoResta);
-                agregarOperacion("Restar", resultadoResta);
-                break;
-
-            case 5: // Calcular IVA
-                let base = pedirNumero("Ingrese el monto al cual desea calcularle el IVA:");
-                let resultadoIVA = base * IVA;
-                let totalConIVA = base + resultadoIVA;
-                alert("El IVA es: " + resultadoIVA + ". El monto total con IVA es: " + totalConIVA);
-                agregarOperacion("Calcular IVA", totalConIVA);
-                break;
-
-            case 6: // Mostrar Historial
-                if (operacionesRealizadas.length === 0) {
-                    alert("No se han realizado operaciones todavía.");
-                } else {
-                    let historial = "Historial de Operaciones:\n";
-                    operacionesRealizadas.forEach((op, index) => {
-                        historial += $ (index + 1) (op.operacion); {op.resultado} n;
-                    });
-                    alert(historial);
-                }
-                break;
-
-            case 7: // Buscar Operaciones
-                let busqueda = prompt("Ingrese un término para buscar en el historial:");
-                if (busqueda) {
-                    let resultadosBusqueda = buscarOperacion(busqueda);
-                    if (resultadosBusqueda.length === 0) {
-                        alert("No se encontraron operaciones con ese término.");
-                    } else {
-                        let resultados = "Resultados de búsqueda:\n";
-                        resultadosBusqueda.forEach((op, index) => {
-                            resultados += $(index + 1); {op.operacion}; {op.resultado} n;
-                        });
-                        alert(resultados);
-                    }
-                } else {
-                    alert("No ingresó ningún término para buscar.");
-                }
-                break;
-
-            case 8: // Salir
-                alert("Gracias por usar el programa. ¡Hasta luego!");
-                return;
-
-            default:
-                alert("Opción inválida");
-                break;
-        }
+// Función para mostrar el historial de operaciones dinámicamente
+function mostrarHistorial() {
+    output.innerHTML = "";
+    if (operacionesRealizadas.length === 0) {
+        output.textContent = "No se han realizado operaciones todavía.";
+    } else {
+        const ul = document.createElement("ul");
+        operacionesRealizadas.forEach((op, index) => {
+            const li = document.createElement("li");
+            li.textContent = `${index + 1}. ${op.operacion}: ${op.resultado}`;
+            ul.appendChild(li);
+        });
+        output.appendChild(ul);
     }
 }
 
-// Llamar a la función principal
-iniciarPrograma();
+// Función para ejecutar operaciones
+function ejecutarOperacion(opcion) {
+    let numero1, numero2, resultado;
+
+    switch (opcion) {
+        case "multiplicar":
+            numero1 = parseFloat(input1.value);
+            numero2 = parseFloat(input2.value);
+            if (!isNaN(numero1) && !isNaN(numero2)) {
+                resultado = numero1 * numero2;
+                operacionesRealizadas.push({ operacion: "Multiplicar", resultado });
+                result.textContent = `El resultado de multiplicar es: ${resultado}`;
+            } else {
+                result.textContent = "Por favor, ingrese números válidos.";
+            }
+            break;
+
+        case "dividir":
+            numero1 = parseFloat(input1.value);
+            numero2 = parseFloat(input2.value);
+            if (!isNaN(numero1) && !isNaN(numero2)) {
+                if (numero2 !== 0) {
+                    resultado = numero1 / numero2;
+                    operacionesRealizadas.push({ operacion: "Dividir", resultado });
+                    result.textContent = `El resultado de dividir es: ${resultado}`;
+                } else {
+                    result.textContent = "No se puede dividir por cero.";
+                }
+            } else {
+                result.textContent = "Por favor, ingrese números válidos.";
+            }
+            break;
+
+        case "sumar":
+            numero1 = parseFloat(input1.value);
+            numero2 = parseFloat(input2.value);
+            if (!isNaN(numero1) && !isNaN(numero2)) {
+                resultado = numero1 + numero2;
+                operacionesRealizadas.push({ operacion: "Sumar", resultado });
+                result.textContent = `El resultado de sumar es: ${resultado}`;
+            } else {
+                result.textContent = "Por favor, ingrese números válidos.";
+            }
+            break;
+
+        case "restar":
+            numero1 = parseFloat(input1.value);
+            numero2 = parseFloat(input2.value);
+            if (!isNaN(numero1) && !isNaN(numero2)) {
+                resultado = numero1 - numero2;
+                operacionesRealizadas.push({ operacion: "Restar", resultado });
+                result.textContent = `El resultado de restar es: ${resultado}`;
+            } else {
+                result.textContent = "Por favor, ingrese números válidos.";
+            }
+            break;
+
+        case "iva":
+            numero1 = parseFloat(input1.value);
+            if (!isNaN(numero1)) {
+                const iva = numero1 * IVA;
+                resultado = numero1 + iva;
+                operacionesRealizadas.push({ operacion: "Calcular IVA", resultado });
+                result.textContent = `El IVA es: ${iva}. Total con IVA: ${resultado}`;
+            } else {
+                result.textContent = "Por favor, ingrese un número válido.";
+            }
+            break;
+
+        case "historial":
+            mostrarHistorial();
+            break;
+
+        default:
+            result.textContent = "Opción inválida.";
+    }
+}
+
+// Función para manejar cambios en el menú
+function manejarCambioMenu() {
+    const opcion = menu.value;
+    if (opcion === "historial") {
+        inputSection.style.display = "none";
+        executeButton.textContent = "Mostrar Historial";
+    } else {
+        inputSection.style.display = "block";
+        executeButton.textContent = "Ejecutar";
+    }
+}
+
+// Función para manejar entrada de datos
+function manejarEntradaNumero1() {
+    if (isNaN(parseFloat(input1.value))) {
+        result.textContent = "Por favor, ingrese un número válido en el primer campo.";
+    } else {
+        result.textContent = "";
+    }
+}
+
+function manejarEntradaNumero2() {
+    if (isNaN(parseFloat(input2.value))) {
+        result.textContent = "Por favor, ingrese un número válido en el segundo campo.";
+    } else {
+        result.textContent = "";
+    }
+}
+
+// Función para cargar datos 
+async function cargarDatos() {
+    try {
+        const response = await fetch("https://jsonplaceholder.typicode.com/posts");
+        if (!response.ok) throw new Error("Error al cargar los datos");
+        const data = await response.json();
+
+        dataSection.innerHTML = "";
+        const ul = document.createElement("ul");
+        data.slice(0, 5).forEach(item => {
+            const li = document.createElement("li");
+            li.textContent = `${item.id}: ${item.title}`;
+            ul.appendChild(li);
+        });
+        dataSection.appendChild(ul);
+    } catch (error) {
+        dataSection.textContent = "Ocurrió un error al cargar los datos.";
+    }
+}
+
+// Event listeners
+menu.addEventListener("change", manejarCambioMenu);
+executeButton.addEventListener("click", () => {
+    const opcion = menu.value;
+    ejecutarOperacion(opcion);
+});
+input1.addEventListener("input", manejarEntradaNumero1);
+input2.addEventListener("input", manejarEntradaNumero2);
+fetchButton.addEventListener("click", cargarDatos);
