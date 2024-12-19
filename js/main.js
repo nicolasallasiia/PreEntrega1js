@@ -136,23 +136,35 @@ function manejarEntradaNumero2() {
     }
 }
 
-// Función para cargar datos 
+// Función para cargar datos desde la API (reqres.in)
 async function cargarDatos() {
     try {
-        const response = await fetch("https://jsonplaceholder.typicode.com/posts");
-        if (!response.ok) throw new Error("Error al cargar los datos");
+        const response = await fetch("https://reqres.in/api/users?page=1");
+
+        // Verificar si la respuesta es exitosa
+        if (!response.ok) {
+            throw new Error(`Error al cargar los datos: ${response.statusText}`);
+        }
+
+        // Procesar la respuesta JSON
         const data = await response.json();
 
+        // Depuración: Ver los datos cargados en la consola
+        console.log(data);  // Verificar si los datos son los esperados
+
+        // Actualizar la UI con los datos
         dataSection.innerHTML = "";
         const ul = document.createElement("ul");
-        data.slice(0, 5).forEach(item => {
+        data.data.slice(0, 5).forEach(item => {
             const li = document.createElement("li");
-            li.textContent = `${item.id}: ${item.title}`;
+            li.textContent = `${item.id}: ${item.first_name} ${item.last_name}`;
             ul.appendChild(li);
         });
         dataSection.appendChild(ul);
+
     } catch (error) {
-        dataSection.textContent = "Ocurrió un error al cargar los datos.";
+        console.error("Error al cargar los datos: ", error);
+        dataSection.textContent = `Ocurrió un error al cargar los datos: ${error.message}`;
     }
 }
 
